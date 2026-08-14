@@ -2,7 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#04070e">
+<!-- "Add to Home Screen" launches with no browser chrome — matters for recording -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="GVR Lottery">
 <title>GVR Draft Lottery</title>
 <style>
 /* ============================================================
@@ -31,6 +37,11 @@ body{font-family:"Arial Black","Helvetica Neue",Impact,sans-serif;
 }
 
 /* ---------- stage ---------- */
+/* The stage is a fixed 432x768 box scaled to fit. It is deliberately larger
+   than a phone viewport, so it lives inside a fixed, clipped wrapper — without
+   that, mobile browsers grow the layout viewport to contain the overflow and
+   window.innerWidth starts reporting 432 on a 375px screen. */
+#viewport{position:fixed;inset:0;overflow:hidden;background:#04070e}
 #stage{
   position:absolute;width:432px;height:768px;transform-origin:top left;
   background:
@@ -322,6 +333,7 @@ body{font-family:"Arial Black","Helvetica Neue",Impact,sans-serif;
 </head>
 <body>
 
+<div id="viewport">
 <div id="stage">
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="field"></div>
@@ -422,6 +434,7 @@ body{font-family:"Arial Black","Helvetica Neue",Impact,sans-serif;
     </div>
   </div>
 </div>
+</div>
 
 <script>
 "use strict";
@@ -471,13 +484,41 @@ const resultTxt  = $("resultTxt");
    4. Stage scaling — keeps the 9:16 composition identical everywhere
    ============================================================ */
 function fitStage() {
-  const s = Math.min(window.innerWidth / 432, window.innerHeight / 768);
+  // visualViewport is the actually-visible area (excludes a collapsing URL bar);
+  // clientWidth/Height is the fallback. innerWidth is NOT safe here — an
+  // oversized stage inflates it on mobile and the scale feeds back on itself.
+  const vv = window.visualViewport;
+  const de = document.documentElement;
+  const w = Math.round(vv ? vv.width  : de.clientWidth);
+  const h = Math.round(vv ? vv.height : de.clientHeight);
+
+  const s = Math.min(w / 432, h / 768);
   stage.style.transform = "scale(" + s + ")";
-  stage.style.left = ((window.innerWidth  - 432 * s) / 2) + "px";
-  stage.style.top  = ((window.innerHeight - 768 * s) / 2) + "px";
+  stage.style.left = ((w - 432 * s) / 2) + "px";
+  stage.style.top  = ((h - 768 * s) / 2) + "px";
 }
 window.addEventListener("resize", fitStage);
-window.addEventListener("orientationchange", function(){ setTimeout(fitStage, 120); });
+window.addEventListener("orientationchange", function () { setTimeout(fitStage, 150); });
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", fitStage);
+  window.visualViewport.addEventListener("scroll", fitStage);
+}
+
+/* Double-tap the backdrop for fullscreen (Android Chrome / desktop; iPhone
+   Safari has no Fullscreen API — use Add to Home Screen there instead). */
+(function () {
+  let lastTap = 0;
+  document.addEventListener("pointerup", function (e) {
+    if (e.target.closest("button, textarea, .machine, .ov")) return;
+    const now = Date.now();
+    if (now - lastTap < 400) {
+      const el = document.documentElement;
+      if (document.fullscreenElement) { (document.exitFullscreen || function(){}).call(document); }
+      else if (el.requestFullscreen) { el.requestFullscreen().catch(function(){}); }
+      lastTap = 0;
+    } else lastTap = now;
+  }, { passive: true });
+})();
 
 /* ============================================================
    5. Decor: starfield + marquee bulbs

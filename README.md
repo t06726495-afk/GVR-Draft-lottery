@@ -34,6 +34,26 @@ and the final screen all follow the list length.
 `SPACE` or `ENTER` also spins, so you can drive it without the cursor on screen.
 **SFX** toggles the synthesised reel clicks and win chime.
 
+## Running it on a phone
+
+It works in mobile Safari and Chrome — the stage scales to fit whatever screen it
+lands on. Two ways to get it there:
+
+- **GitHub Pages** (easiest): repo *Settings → Pages → Deploy from branch*, pick
+  this branch and `/ (root)`. Open the resulting URL on the phone and bookmark it.
+- **Send yourself the file** — AirDrop, email, or a message. On Android, open it
+  from Files in Chrome. On iOS, opening a local `.html` from the Files app is
+  unreliable, so the hosted URL is the better route.
+
+For a clean recording with no browser chrome in frame, use **Add to Home Screen**
+and launch from the icon — the meta tags in the file make it open standalone. On
+Android you can also double-tap the backdrop for true fullscreen (iPhone Safari
+has no Fullscreen API, so Add to Home Screen is the way there).
+
+Two phone-specific notes: the iPhone's ring/silent switch mutes WebAudio, so flip
+it to ring if you want the reel clicks in the recording; and hold the phone
+portrait — landscape shrinks the machine to fit the short edge.
+
 ## About the reel landing
 
 The winner is chosen *before* the animation starts, and the strip is built with
