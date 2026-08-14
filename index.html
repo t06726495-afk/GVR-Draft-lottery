@@ -427,13 +427,14 @@ body{font-family:"Arial Black","Helvetica Neue",Impact,sans-serif;
 "use strict";
 
 /* ============================================================
-   1. THE ROSTER  — edit this list, or use the ⚙ button in the app
+   1. THE ROSTER  — edit this list, or use the EDIT button in the app.
+   Each name is drawn exactly once: the winner is spliced out of `pool`
+   the moment it lands, so it can never come up on a later spin.
    ============================================================ */
 let NAMES = [
-  "Taylor",   // <-- real entry
-  "Mike", "Sara", "Jake", "Nick", "Emma",   // placeholders: replace with
-  "Luke", "Dave", "Kate", "Ryan", "Josh",   // your other 11 owners
-  "Tony"
+  "Taylor", "Kirch", "Val",   "Nate",
+  "Katie",  "Greg",  "Augie", "Aaron",
+  "Cesar",  "Fran",  "Mel",   "Colin"
 ];
 
 /* ============================================================
